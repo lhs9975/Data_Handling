@@ -40,7 +40,7 @@ import os
 import pandas as pd
 
 # CSV 파일들이 저장된 디렉토리 경로
-directory = r'E:\MLTA_05_14_4'
+directory = r'E:\MLTA_TEST_05_21\MLTA_csv'
 
 # 모든 파일의 온도 데이터를 저장할 데이터프레임 리스트
 data_frames = []
@@ -73,7 +73,7 @@ for filename in os.listdir(directory):
 combined_df = pd.concat(data_frames, axis=1)
 
 # 새로운 CSV 파일로 저장
-output_filepath = r'C:\Users\MSI\Desktop\회사\개발\MLTA\dataset\company_data\trace_data_excel\time_5\combined_temperatures_05_14_4.csv'
+output_filepath = r'C:\Users\MSI\Desktop\회사\개발\MLTA\dataset\company_data\trace_data_excel\time_10\combined_temperatures_05_21.csv'
 combined_df.to_csv(output_filepath, index=False, header=False)
 
 print(f"온도 데이터가 {output_filepath}에 저장되었습니다.")
