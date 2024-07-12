@@ -4,7 +4,7 @@ import os
 import pandas as pd
 
 # 디렉터리 경로 지정
-directory = r"C:\Users\MSI\Desktop\회사\개발\MLTA\dataset\company_data\trace_data_excel\24_05_21_time_10\trace_excel"
+directory = r"C:\Users\MSI\Desktop\회사\개발\GS_ENR\Data\csv"
 
 # 빈 DataFrame 생성
 all_temp_data = pd.DataFrame()
@@ -19,14 +19,14 @@ for filename in os.listdir(directory):
         # 각 시트에서 온도 데이터만 선택
         temp_data_per_file = pd.DataFrame()
         for sheet_name, df in data.items():
-            temp_data = df.iloc[1:10002, 1]  # 1열(온도 데이터)만 선택
+            temp_data = df.iloc[1:1000, 1]  # 1열(온도 데이터)만 선택
             temp_data_per_file = pd.concat([temp_data_per_file, temp_data], axis=1)
 
         # 모든 파일의 데이터를 하나로 연결
         all_temp_data = pd.concat([all_temp_data, temp_data_per_file], axis=1)
 
 # 모든 데이터를 하나의 Excel 파일로 저장
-output_filepath = r"C:\Users\MSI\Desktop\회사\개발\MLTA\dataset\company_data\trace_data_excel\24_05_21_time_10\combined_data\concat_time_10.xlsx"
+output_filepath = r"C:\Users\MSI\Desktop\회사\개발\GS_ENR\Data\all_data\CH2\GS_ENR_CH2_PM.xlsx"
 all_temp_data.to_excel(output_filepath, index=False, header=False)
 
 print("The data from all Excel files in the folder have been concatenated and saved as:", output_filepath)
