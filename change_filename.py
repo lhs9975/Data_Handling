@@ -9,4 +9,4 @@ def rename_files(directory, prefix):
 
 # 함수를 호출하여 파일 이름을 변경합니다.
 # 'directory'는 파일이 있는 디렉토리의 경로이며, 'prefix'는 새 파일 이름의 접두사입니다.
-rename_files(r'C:\Users\MSI\Desktop\test\test2\water', 'train_water')
+rename_files(r"C:\Users\MSI\Desktop\company\develop\Leak_Detection\data\image\classification\TPI_train", 'train_tpi')
