@@ -24,9 +24,9 @@
 import os
 import shutil
 
-source_folder = r'E:\MLTA_TEST_05_13'  # 소스 폴더 경로를 지정하세요.
-target_folder_base = r'C:\Users\MSI\Desktop\회사\개발\MLTA\dataset\company_data\tra_data\time_60_split'  # 타겟 폴더 베이스 경로를 지정하세요.
-files_per_batch = 300  # 한 폴더 당 파일 개수
+source_folder = r'C:\Users\MSI\Desktop\회사\개발\MLTA\dataset\real_data\GS_ENR\tra\ch2\all'  # 소스 폴더 경로를 지정하세요.
+target_folder_base = r'C:\Users\MSI\Desktop\회사\개발\MLTA\dataset\real_data\GS_ENR\tra\ch2'  # 타겟 폴더 베이스 경로를 지정하세요.
+files_per_batch = 200  # 한 폴더 당 파일 개수
 
 # 소스 폴더에서 .tra 파일 목록을 가져옵니다.
 file_list = [f for f in os.listdir(source_folder) if f.endswith('.tra')]
