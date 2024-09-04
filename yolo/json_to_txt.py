@@ -2,8 +2,8 @@ import os
 import json
 
 # 변환할 JSON 파일들이 있는 디렉토리 경로 설정
-input_directory = r"E:\작물 병 데이터\104.식물 병 유발 통합 데이터\01.데이터\2.Validation\라벨링데이터\VL1_고추\abnormal_all"
-output_directory = r"E:\작물 병 데이터\104.식물 병 유발 통합 데이터\01.데이터\2.Validation\라벨링데이터\VL1_고추\abnormal"
+input_directory = r"E:\plant_disease_project\압축 해제 데이터\TL1_고추\작물보호제처리반응"
+output_directory = r"E:\plant_disease_project\data\labels\abnormal"
 
 # 출력 디렉토리가 없으면 생성
 os.makedirs(output_directory, exist_ok=True)
