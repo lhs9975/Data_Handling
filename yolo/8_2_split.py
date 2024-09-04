@@ -3,11 +3,11 @@ import random
 import shutil
 
 # 원본 이미지 디렉토리 경로 설정
-source_directory = r"E:\작물 병 데이터\abnormal_image"
+source_directory = r"E:\plant_disease_project\dataset\images\abnormal_train\작물보호제처리반응"
 
 # 분할 후 저장할 디렉토리 경로 설정
-train_directory = r"E:\작물 병 데이터\dataset\train\images"
-val_directory = r"E:\작물 병 데이터\dataset\valid\images"
+train_directory = r"E:\plant_disease_project\dataset\images\train"
+val_directory = r"E:\plant_disease_project\dataset\images\valid"
 
 # 출력 디렉토리가 없으면 생성
 os.makedirs(train_directory, exist_ok=True)
