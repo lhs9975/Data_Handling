@@ -193,17 +193,111 @@ import os
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# 청크 분할하여 데이터 처리
+
+# import h5py
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from scipy.signal.windows import blackmanharris
+# import os
+#
+# # 디렉토리 경로 설정
+# directory_path = r"H:\240821_osong_hdf5\240521"
+# fs = 2500
+# chunk_size = 150000
+# fft_size = int(fs * 0.25)
+# group_of_low_freq_bounds = [0, 8, 20, 48, 100]
+# group_of_high_freq_bounds = [8, 20, 48, 100, fs / 2]
+# count_of_bands = 5
+#
+# group_of_low_freq_indices = np.ceil(np.array(group_of_low_freq_bounds) / (fs / fft_size)).astype(int)
+# group_of_high_freq_indices = np.ceil(np.array(group_of_high_freq_bounds) / (fs / fft_size)).astype(int)
+#
+# fft_window = blackmanharris(fft_size)
+# window_power_adjustment = np.sum(fft_window ** 2)
+#
+# # 디렉토리 내의 모든 HDF5 파일에 대해 처리
+# for file_name in os.listdir(directory_path):
+#     if file_name.endswith(".hdf5"):
+#         file_path = os.path.join(directory_path, file_name)
+#
+#         with h5py.File(file_path, 'r') as h5file:
+#             dataset = h5file['DAS']
+#             total_length = dataset.shape[0]
+#
+#             for start in range(0, total_length, chunk_size):
+#                 end = start + chunk_size
+#                 diff_phase = h5file['DAS'][start:end, :3000]
+#                 phase_s64_T = np.int64(diff_phase)  # Create a 64-bit int copy for accumulation
+#
+#                 # Accumulate differential phase to obtain phase
+#                 phase_s64_T = np.cumsum(phase_s64_T, axis=0)
+#                 phase = phase_s64_T * np.pi / 2 ** 15  # Convert to radians
+#
+#                 fft_window_array = np.tile(fft_window, (phase.shape[1], 1)).T
+#                 count_of_blocks = phase.shape[0] // fft_size
+#                 fbe_store = np.zeros((count_of_bands, phase.shape[1], count_of_blocks), dtype=np.float32)
+#
+#                 for k in range(count_of_blocks):
+#                     data = phase[k * fft_size:(k + 1) * fft_size, :]
+#
+#                     # De-mean operation and cast to float32
+#                     mn = np.mean(data, axis=0)
+#                     data = data - mn
+#                     data = data.astype(np.float32)
+#
+#                     windowed_phase = data * fft_window_array
+#                     fft_data_c = np.fft.fft(windowed_phase, n=fft_size, axis=0)
+#
+#                     # Select the appropriate frequency range
+#                     if fft_size % 2 == 1:  # Odd
+#                         select = np.arange((fft_size + 1) // 2)
+#                         fft_data_r = np.abs(fft_data_c[select, :]) ** 2
+#                         fft_data_r[1:] = fft_data_r[1:] * 2
+#                     else:  # Even
+#                         select = np.arange(fft_size // 2 + 1)
+#                         fft_data_r = np.abs(fft_data_c[select, :]) ** 2
+#                         fft_data_r[1:-1] = fft_data_r[1:-1] * 2
+#
+#                     fft_data_r = fft_data_r / (window_power_adjustment * fs)
+#
+#                     for i in range(count_of_bands):
+#                         fbe_store[i, :, k] = np.mean(
+#                             fft_data_r[group_of_low_freq_indices[i]:group_of_high_freq_indices[i], :], axis=0
+#                         )
+#                     fbe_store[:, :, k] = 10 * np.log10(fbe_store[:, :, k])
+#
+#                 # Example data for plotting
+#                 data = fbe_store[3, :, :].T
+#
+#                 # Create X and Y coordinates
+#                 x = np.arange(data.shape[1])
+#                 y = np.arange(data.shape[0])
+#                 X, Y = np.meshgrid(x, y)
+#
+#                 # Plot the data
+#                 plt.figure(figsize=(12, 8))
+#                 plt.pcolormesh(X, Y, data, shading='auto', cmap='viridis', vmin=-40, vmax=-10)
+#                 plt.colorbar(label='Amplitude')
+#
+#                 plt.xlabel('X')
+#                 plt.ylabel('Y')
+#                 plt.title(f'Waterfall Plot for {file_name} - Chunk {start // chunk_size + 1}')
+#
+#                 plt.show()
+
+# ----------------------------------------------------------------------------------------------------------------------
+# 전체 데이터 처리
 
 import h5py
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal.windows import blackmanharris
-import os
 
-# 디렉토리 경로 설정
-directory_path = r"H:\240821_osong_hdf5\240507"
-fs = 2500
-chunk_size = 150000
+# HDF5 파일 경로 설정
+file_path = r"H:\APSensing_TPI\20230308-tpi\08-03-2023\Phase Data\0000023659_2023-03-08_10.13.41.95429.hdf5"
+
+fs = 1000
 fft_size = int(fs * 0.25)
 group_of_low_freq_bounds = [0, 8, 20, 48, 100]
 group_of_high_freq_bounds = [8, 20, 48, 100, fs / 2]
@@ -215,72 +309,67 @@ group_of_high_freq_indices = np.ceil(np.array(group_of_high_freq_bounds) / (fs /
 fft_window = blackmanharris(fft_size)
 window_power_adjustment = np.sum(fft_window ** 2)
 
-# 디렉토리 내의 모든 HDF5 파일에 대해 처리
-for file_name in os.listdir(directory_path):
-    if file_name.endswith(".hdf5"):
-        file_path = os.path.join(directory_path, file_name)
+# HDF5 파일 처리
+with h5py.File(file_path, 'r') as h5file:
+    dataset = h5file['DAS']
+    total_length = dataset.shape[0]
 
-        with h5py.File(file_path, 'r') as h5file:
-            dataset = h5file['DAS']
-            total_length = dataset.shape[0]
+    # 전체 데이터를 한 번에 로드
+    diff_phase = dataset[0:100000, 1000:1500]
+    phase_s64_T = np.int64(diff_phase)  # Create a 64-bit int copy for accumulation
 
-            for start in range(0, total_length, chunk_size):
-                end = start + chunk_size
-                diff_phase = h5file['DAS'][start:end, :3000]
-                phase_s64_T = np.int64(diff_phase)  # Create a 64-bit int copy for accumulation
+    # Accumulate differential phase to obtain phase
+    phase_s64_T = np.cumsum(phase_s64_T, axis=0)
+    phase = phase_s64_T * np.pi / 2 ** 15  # Convert to radians
 
-                # Accumulate differential phase to obtain phase
-                phase_s64_T = np.cumsum(phase_s64_T, axis=0)
-                phase = phase_s64_T * np.pi / 2 ** 15  # Convert to radians
+    fft_window_array = np.tile(fft_window, (phase.shape[1], 1)).T
+    count_of_blocks = phase.shape[0] // fft_size
+    fbe_store = np.zeros((count_of_bands, phase.shape[1], count_of_blocks), dtype=np.float32)
 
-                fft_window_array = np.tile(fft_window, (phase.shape[1], 1)).T
-                count_of_blocks = phase.shape[0] // fft_size
-                fbe_store = np.zeros((count_of_bands, phase.shape[1], count_of_blocks), dtype=np.float32)
+    for k in range(count_of_blocks):
+        data = phase[k * fft_size:(k + 1) * fft_size, :]
 
-                for k in range(count_of_blocks):
-                    data = phase[k * fft_size:(k + 1) * fft_size, :]
+        # De-mean operation and cast to float32
+        mn = np.mean(data, axis=0)
+        data = data - mn
+        data = data.astype(np.float32)
 
-                    # De-mean operation and cast to float32
-                    mn = np.mean(data, axis=0)
-                    data = data - mn
-                    data = data.astype(np.float32)
+        windowed_phase = data * fft_window_array
+        fft_data_c = np.fft.fft(windowed_phase, n=fft_size, axis=0)
 
-                    windowed_phase = data * fft_window_array
-                    fft_data_c = np.fft.fft(windowed_phase, n=fft_size, axis=0)
+        # Select the appropriate frequency range
+        if fft_size % 2 == 1:  # Odd
+            select = np.arange((fft_size + 1) // 2)
+            fft_data_r = np.abs(fft_data_c[select, :]) ** 2
+            fft_data_r[1:] = fft_data_r[1:] * 2
+        else:  # Even
+            select = np.arange(fft_size // 2 + 1)
+            fft_data_r = np.abs(fft_data_c[select, :]) ** 2
+            fft_data_r[1:-1] = fft_data_r[1:-1] * 2
 
-                    # Select the appropriate frequency range
-                    if fft_size % 2 == 1:  # Odd
-                        select = np.arange((fft_size + 1) // 2)
-                        fft_data_r = np.abs(fft_data_c[select, :]) ** 2
-                        fft_data_r[1:] = fft_data_r[1:] * 2
-                    else:  # Even
-                        select = np.arange(fft_size // 2 + 1)
-                        fft_data_r = np.abs(fft_data_c[select, :]) ** 2
-                        fft_data_r[1:-1] = fft_data_r[1:-1] * 2
+        fft_data_r = fft_data_r / (window_power_adjustment * fs)
 
-                    fft_data_r = fft_data_r / (window_power_adjustment * fs)
+        for i in range(count_of_bands):
+            fbe_store[i, :, k] = np.mean(
+                fft_data_r[group_of_low_freq_indices[i]:group_of_high_freq_indices[i], :], axis=0
+            )
+        fbe_store[:, :, k] = 10 * np.log10(fbe_store[:, :, k])
 
-                    for i in range(count_of_bands):
-                        fbe_store[i, :, k] = np.mean(
-                            fft_data_r[group_of_low_freq_indices[i]:group_of_high_freq_indices[i], :], axis=0
-                        )
-                    fbe_store[:, :, k] = 10 * np.log10(fbe_store[:, :, k])
+    # Example data for plotting
+    data = fbe_store[2, :, :].T
 
-                # Example data for plotting
-                data = fbe_store[3, :, :].T
+    # Create X and Y coordinates
+    x = np.arange(data.shape[1])
+    y = np.arange(data.shape[0])
+    X, Y = np.meshgrid(x, y)
 
-                # Create X and Y coordinates
-                x = np.arange(data.shape[1])
-                y = np.arange(data.shape[0])
-                X, Y = np.meshgrid(x, y)
+    # Plot the data
+    plt.figure(figsize=(12, 8))
+    plt.pcolormesh(X, Y, data, shading='auto', cmap='plasma')
+    plt.colorbar(label='Amplitude')
 
-                # Plot the data
-                plt.figure(figsize=(12, 8))
-                plt.pcolormesh(X, Y, data, shading='auto', cmap='viridis', vmin=-40, vmax=-10)
-                plt.colorbar(label='Amplitude')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.title(f'Waterfall Plot for {file_path}')
 
-                plt.xlabel('X')
-                plt.ylabel('Y')
-                plt.title(f'Waterfall Plot for {file_name} - Chunk {start // chunk_size + 1}')
-
-                plt.show()
+    plt.show()
